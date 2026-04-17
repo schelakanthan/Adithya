@@ -49,7 +49,7 @@ function AppContent() {
         onPageChange={handlePageChange}
       />
       
-      {/* <div className="pt-16"> */}
+      <div className="pt-16">
         <Routes>
           <Route path="/" element={<AdithyaShoes />} />
           <Route path="/products" element={<AdithyaProducts />} />
@@ -58,7 +58,7 @@ function AppContent() {
           <Route path="/contact" element={<AdithyaContact />} />
         </Routes>
       </div>
-    // </div>
+    </div>
   );
 }
 
