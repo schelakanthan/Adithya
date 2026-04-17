@@ -3,21 +3,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   ShoppingBag, 
   Star, 
-  Truck, 
+
   Shield, 
-  RefreshCw, 
+ 
   Heart,
-  Menu,
-  X,
+
   ChevronRight,
-  Send,
+
   Leaf,
   Recycle,
   Droplet,
   Sun,
   Award,
-  Globe,
-  Zap
+
 } from 'lucide-react';
 
 import bg from "./im/SNEAKER_GUIDE_OPENER.webp";

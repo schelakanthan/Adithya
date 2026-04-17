@@ -5,7 +5,7 @@ import {
   Mail, 
   Clock, 
   MessageCircle,
-  CheckCircle,
+
   Navigation,
   Car,
   Coffee,

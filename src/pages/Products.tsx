@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  ShoppingBag, 
+  
   Star, 
   Heart, 
-  ChevronRight,
+ 
   Filter,
   X,
   Minus,
@@ -12,11 +12,11 @@ import {
   Shield,
   RefreshCw,
   CheckCircle,
-  ArrowLeft
+
 } from 'lucide-react';
 
 // Re-using same image imports from your homepage (adjust paths as needed)
-import et from "./im/SNEAKER_GUIDE_OPENER.webp";
+
 import a from "./im/1.jpeg";
 import b from "./im/2.jpeg";
 import c from "./im/4.jpeg";

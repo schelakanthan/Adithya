@@ -6,12 +6,10 @@ import {
   Users, 
   MapPin, 
   Clock, 
-  Mail, 
+
   Phone,
-  ChevronRight,
-  Star,
-  Truck,
-  RefreshCw,
+
+ 
 
   Leaf,
   Briefcase,
