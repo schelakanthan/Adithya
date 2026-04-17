@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* If you need to keep your theme settings, they go here now */
+@theme {
+  --color-brand-blue: #1e40af;
+  --color-brand-gold: #f59e0b;
+}
