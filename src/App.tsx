@@ -1,69 +1,40 @@
-import { useState } from 'react';
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import AdithyaShoes from './pages/Home';
-import AdithyaAbout from './pages/About';
-import AdithyaContact from './pages/Contact';
-import AdithyaProducts from './pages/Products';
-import ProductDetails from './pages/ProductDetails';
-import Navbar from './pages/Navbar';
+// src/App.tsx - With lazy loading for better performance
+import React, { lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-type PageType = 'shop' | 'products' | 'about' | 'contact';
+// Lazy load pages for better initial load time
+const HomePage = lazy(() => import('./pages/Home'));
+const ProjectsPage = lazy(() => import('./pages/Products'));
+const ProjectDetail = lazy(() => import('./pages/ProductDetails'));
+const ExperiencePage = lazy(() => import('./pages/ExperiencePage'));
+const ContactPage = lazy(() => import('./pages/Contact'));
 
-// Wrapper component to handle navigation state
-function AppContent() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  
-  // Determine active page based on current path - add explicit return type
-  const getActivePage = (): PageType => {
-    const path = location.pathname;
-    if (path === '/') return 'shop';
-    if (path === '/products') return 'products';
-    if (path === '/about') return 'about';
-    if (path === '/contact') return 'contact';
-    return 'shop'; // default return
-  };
+// Loading component
+const LoadingSpinner = () => (
+  <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+    <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
 
-  const [activePage, setActivePage] = useState<PageType>(getActivePage());
-
-  const handlePageChange = (page: PageType) => {
-    setActivePage(page);
-    switch(page) {
-      case 'shop':
-        navigate('/');
-        break;
-      case 'products':
-        navigate('/products');
-        break;
-      case 'about':
-        navigate('/about');
-        break;
-      case 'contact':
-        navigate('/contact');
-        break;
-    }
-  };
-
+const App: React.FC = () => {
   return (
-    <div className="relative">
-      <Navbar 
-        activePage={activePage} 
-        onPageChange={handlePageChange}
-      />
-      
-    
+    <Router
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
+      <Suspense fallback={<LoadingSpinner />}>
         <Routes>
-          <Route path="/" element={<AdithyaShoes />} />
-          <Route path="/products" element={<AdithyaProducts />} />
-          <Route path="/product/:id" element={<ProductDetails />} />
-          <Route path="/about" element={<AdithyaAbout />} />
-          <Route path="/contact" element={<AdithyaContact />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/project/:id" element={<ProjectDetail />} />
+          <Route path="/experience" element={<ExperiencePage />} />
+          <Route path="/contact" element={<ContactPage />} />
         </Routes>
-    
-    </div>
+      </Suspense>
+    </Router>
   );
-}
+};
 
-export default function App() {
-  return <AppContent />;
-}
+export default App;

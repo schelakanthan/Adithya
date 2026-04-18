@@ -1,14 +1,32 @@
-// main.tsx or index.tsx
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'  // Add this import
-import App from './App'
-import './index.css'
+// src/main.tsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import './index.css';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <BrowserRouter>  {/* Wrap App with BrowserRouter */}
+// Remove loading screen when app is ready
+const removeLoadingScreen = () => {
+  const loadingElement = document.getElementById('loading');
+  if (loadingElement) {
+    loadingElement.style.opacity = '0';
+    setTimeout(() => {
+      loadingElement.remove();
+    }, 300);
+  }
+};
+
+// Use requestIdleCallback for non-critical initialization
+const init = () => {
+  ReactDOM.createRoot(document.getElementById('root')!).render(
+    <React.StrictMode>
       <App />
-    </BrowserRouter>
-  </React.StrictMode>,
-)
+    </React.StrictMode>
+  );
+  removeLoadingScreen();
+};
+
+if ('requestIdleCallback' in window) {
+  requestIdleCallback(init, { timeout: 2000 });
+} else {
+  setTimeout(init, 100);
+}

@@ -1,759 +1,393 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+// pages/ProjectDetail.tsx
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { 
+  ArrowLeft, 
 
-interface Product {
-  id: number;
-  name: string;
-  price: string;
-  originalPrice: string;
-  tag: string;
-  color: string;
-  accent: string;
-  desc: string;
-  longDesc: string;
-  emoji: string;
-  category: string;
-  rating: number;
-  reviews: number;
-  inStock: boolean;
-  isNew: boolean;
-  isSale: boolean;
-  sizes: number[];
-  colors: string[];
-  features?: string[];
-  materials?: string[];
-  careInstructions?: string[];
-}
+  ExternalLink, 
+  Calendar, 
+  Star, 
+  Users,
+  Cpu,
+  Shield,
+  Zap,
+  Clock,
+  CheckCircle,
+  Layers,
+  ShoppingBag,
+  Heart,
+  Copy,
+  Check
+} from 'lucide-react';
+import Navbar from './Navbar';
+import FloatingShapes from './components/FloatingShapes';
+import { projects } from './data/portfolioData';
+import { Project } from './data/portfolioData';
 
-const allProducts: Product[] = [
-  {
-    id: 1,
-    name: "Adithya Apex Runner",
-    price: "₹3,499",
-    originalPrice: "₹4,999",
-    tag: "BESTSELLER",
-    color: "#C8A87A",
-    accent: "#1A1A1A",
-    desc: "Engineered for speed. Built for streets.",
-    longDesc: "The Apex Runner features our signature cushioning technology, breathable mesh upper, and a durable rubber outsole. Perfect for daily runs and casual wear. Engineered with input from professional athletes, this shoe delivers exceptional energy return and stability.",
-    emoji: "👟",
-    category: "Running",
-    rating: 4.9,
-    reviews: 234,
-    inStock: true,
-    isNew: false,
-    isSale: false,
-    sizes: [6, 7, 8, 9, 10, 11],
-    colors: ["Black/Gold", "White/Silver", "Navy/Red"],
-    features: [
-      "Breathable mesh upper",
-      "Responsive foam cushioning",
-      "Durable rubber outsole",
-      "Lightweight construction (250g)",
-      "Anti-slip grip pattern",
-      "Reflective details for night runs"
-    ],
-    materials: [
-      "Premium mesh fabric",
-      "EVA foam midsole",
-      "Natural rubber outsole",
-      "Cotton laces"
-    ],
-    careInstructions: [
-      "Spot clean with damp cloth",
-      "Air dry away from direct sunlight",
-      "Remove insoles for faster drying",
-      "Use shoe tree to maintain shape"
-    ]
-  },
-  {
-    id: 2,
-    name: "Adithya Cloud Walk",
-    price: "₹2,999",
-    originalPrice: "₹3,999",
-    tag: "NEW",
-    color: "#E8D5C4",
-    accent: "#5C3D2E",
-    desc: "Soft cushioning. All-day comfort.",
-    longDesc: "Experience walking on clouds with our memory foam insole and flexible sole design. Ideal for all-day wear, travel, and casual outings. The Cloud Walk is designed for those who prioritize comfort without sacrificing style.",
-    emoji: "🥿",
-    category: "Casual",
-    rating: 4.8,
-    reviews: 189,
-    inStock: true,
-    isNew: true,
-    isSale: false,
-    sizes: [5, 6, 7, 8, 9, 10],
-    colors: ["Beige", "Tan", "Black"],
-    features: [
-      "Memory foam insole",
-      "Flexible slip-resistant sole",
-      "Breathable knit upper",
-      "Machine washable",
-      "Ultra-lightweight design",
-      "Arch support technology"
-    ],
-    materials: [
-      "Knit fabric upper",
-      "Memory foam insole",
-      "TPR outsole",
-      "Recycled packaging"
-    ],
-    careInstructions: [
-      "Machine wash cold on gentle cycle",
-      "Air dry only",
-      "Do not bleach",
-      "Remove insoles before washing"
-    ]
-  },
-  {
-    id: 3,
-    name: "Adithya Terra Grip",
-    price: "₹4,199",
-    originalPrice: "₹5,999",
-    tag: "TRAIL",
-    color: "#2C3E2D",
-    accent: "#C8A87A",
-    desc: "Grip the ground. Own the outdoors.",
-    longDesc: "Conquer any terrain with our aggressive lug pattern and waterproof materials. Built for adventure, these trail shoes provide exceptional traction on wet and dry surfaces.",
-    emoji: "🥾",
-    category: "Trail",
-    rating: 4.9,
-    reviews: 156,
-    inStock: true,
-    isNew: false,
-    isSale: false,
-    sizes: [7, 8, 9, 10, 11, 12],
-    colors: ["Olive Green", "Brown", "Black"],
-    features: [
-      "Waterproof membrane",
-      "Deep lug pattern for traction",
-      "Rock plate protection",
-      "Reinforced toe cap",
-      "Quick-lace system",
-      "Mud-shedding outsole"
-    ],
-    materials: [
-      "Waterproof nylon upper",
-      "Rubber lug outsole",
-      "EVA foam midsole",
-      "Gore-Tex lining"
-    ],
-    careInstructions: [
-      "Brush off mud and dirt",
-      "Hand wash with mild soap",
-      "Air dry away from heat",
-      "Apply waterproofing spray periodically"
-    ]
-  },
-  {
-    id: 4,
-    name: "Adithya Luxe Slide",
-    price: "₹1,799",
-    originalPrice: "₹2,499",
-    tag: "CASUAL",
-    color: "#1A1A2E",
-    accent: "#E8D5C4",
-    desc: "Effortless style. Every moment.",
-    longDesc: "Slip into luxury with our premium leather slides. Perfect for poolside, beach, or lounging at home. The cushioned footbed molds to your feet over time.",
-    emoji: "🩴",
-    category: "Sandals",
-    rating: 4.7,
-    reviews: 312,
-    inStock: true,
-    isNew: false,
-    isSale: false,
-    sizes: [6, 7, 8, 9, 10],
-    colors: ["Black", "Brown", "Navy"],
-    features: [
-      "Premium leather straps",
-      "Contoured footbed",
-      "Slip-resistant sole",
-      "Water-resistant finish",
-      "Lightweight design",
-      "Easy to clean"
-    ],
-    materials: [
-      "Full-grain leather upper",
-      "EVA foam footbed",
-      "Rubber outsole",
-      "Leather lining"
-    ],
-    careInstructions: [
-      "Wipe with damp cloth",
-      "Use leather conditioner",
-      "Avoid prolonged water exposure",
-      "Store in dust bag"
-    ]
-  },
-  {
-    id: 5,
-    name: "Adithya Urban Pro",
-    price: "₹3,899",
-    originalPrice: "₹5,499",
-    tag: "NEW",
-    color: "#D4A574",
-    accent: "#2C2C2C",
-    desc: "Urban sophistication meets all-day comfort.",
-    longDesc: "Versatile enough for the boardroom and comfortable enough for the commute. Premium leather upper with cushioned insole for all-day wear.",
-    emoji: "👞",
-    category: "Formal",
-    rating: 4.8,
-    reviews: 98,
-    inStock: true,
-    isNew: true,
-    isSale: false,
-    sizes: [7, 8, 9, 10, 11],
-    colors: ["Brown", "Black", "Burgundy"],
-    features: [
-      "Premium leather upper",
-      "Memory foam insole",
-      "Breathable lining",
-      "Classic derby styling",
-      "Durable stacked heel",
-      "Anti-fatigue technology"
-    ],
-    materials: [
-      "Italian leather upper",
-      "Leather lining",
-      "Memory foam insole",
-      "Leather outsole"
-    ],
-    careInstructions: [
-      "Polish with quality shoe cream",
-      "Use shoe trees",
-      "Rotate with other shoes",
-      "Professional cleaning recommended"
-    ]
-  },
-  {
-    id: 6,
-    name: "Adithya Sprint Elite",
-    price: "₹5,299",
-    originalPrice: "₹7,999",
-    tag: "SALE",
-    color: "#E05A5A",
-    accent: "#FAF8F4",
-    desc: "Professional running shoe with carbon plate.",
-    longDesc: "Carbon fiber plate technology for maximum energy return. Designed for competitive runners seeking that extra edge in races.",
-    emoji: "🏃",
-    category: "Running",
-    rating: 4.9,
-    reviews: 67,
-    inStock: true,
-    isNew: false,
-    isSale: true,
-    sizes: [8, 9, 10, 11, 12],
-    colors: ["Red/Black", "Blue/White", "All Black"],
-    features: [
-      "Carbon fiber plate",
-      "Responsive foam midsole",
-      "Engineered mesh upper",
-      "Heel lockdown system",
-      "Weight: 190g",
-      "Competition legal"
-    ],
-    materials: [
-      "Technical mesh upper",
-      "Carbon fiber plate",
-      "Pebax foam midsole",
-      "Rubber outsole"
-    ],
-    careInstructions: [
-      "Spot clean only",
-      "Air dry naturally",
-      "Remove laces for cleaning",
-      "Store in cool dry place"
-    ]
-  },
-  {
-    id: 7,
-    name: "Adithya Heritage Boot",
-    price: "₹6,999",
-    originalPrice: "₹9,999",
-    tag: "LIMITED",
-    color: "#8B4513",
-    accent: "#C8A87A",
-    desc: "Handcrafted leather boots. Built to last.",
-    longDesc: "Full-grain leather boots with Goodyear welt construction. Ages beautifully over time and can be resoled for decades of wear.",
-    emoji: "👢",
-    category: "Boots",
-    rating: 5.0,
-    reviews: 45,
-    inStock: false,
-    isNew: false,
-    isSale: false,
-    sizes: [7, 8, 9, 10, 11],
-    colors: ["Brown", "Tan"],
-    features: [
-      "Full-grain leather",
-      "Goodyear welt construction",
-      "Leather lining",
-      "Stacked leather heel",
-      "Resoleable design",
-      "Water-resistant treatment"
-    ],
-    materials: [
-      "Full-grain leather upper",
-      "Leather lining",
-      "Cork footbed",
-      "Leather outsole"
-    ],
-    careInstructions: [
-      "Condition regularly",
-      "Use shoe trees",
-      "Avoid wet conditions initially",
-      "Professional resoling available"
-    ]
-  },
-  {
-    id: 8,
-    name: "Adithya Breeze Sandal",
-    price: "₹2,299",
-    originalPrice: "₹3,299",
-    tag: "SUMMER",
-    color: "#F4E4C1",
-    accent: "#8B6F47",
-    desc: "Breathable comfort for warm days.",
-    longDesc: "Made from recycled materials with a cork footbed. Perfect for summer adventures, beach days, and casual strolls.",
-    emoji: "👡",
-    category: "Sandals",
-    rating: 4.6,
-    reviews: 178,
-    inStock: true,
-    isNew: false,
-    isSale: true,
-    sizes: [5, 6, 7, 8, 9, 10],
-    colors: ["Natural", "Black", "White"],
-    features: [
-      "Recycled materials",
-      "Cork footbed",
-      "Adjustable straps",
-      "Lightweight design",
-      "Quick-dry materials",
-      "Eco-friendly packaging"
-    ],
-    materials: [
-      "Recycled PET straps",
-      "Cork footbed",
-      "Natural rubber outsole",
-      "Organic cotton lining"
-    ],
-    careInstructions: [
-      "Hand wash with mild soap",
-      "Air dry in shade",
-      "Avoid machine washing",
-      "Spot clean as needed"
-    ]
-  }
-];
-
-export default function ProductDetails() {
+const ProjectDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [selectedSize, setSelectedSize] = useState<number | null>(null);
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"details" | "specs" | "care">("details");
-  const [heroVisible, setHeroVisible] = useState(false);
-  const [toastMsg, setToastMsg] = useState("");
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
+  const [liked, setLiked] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => setHeroVisible(true), 100);
-    const foundProduct = allProducts.find(p => p.id === parseInt(id || "0"));
-    if (foundProduct) {
-      setProduct(foundProduct);
-      setSelectedColor(foundProduct.colors[0]);
-      setSelectedSize(foundProduct.sizes[2]);
+    const foundProject = projects.find(p => p.id === parseInt(id || '0'));
+    if (foundProject) {
+      setProject(foundProject);
     }
+    setLoading(false);
   }, [id]);
 
-  const handleContactToBuy = () => {
-    setToastMsg(`Redirecting to contact page for ${product?.name} inquiry...`);
-    setTimeout(() => {
-      navigate("/contact", { state: { productName: product?.name, productId: product?.id } });
-    }, 1500);
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  if (!product) {
+  const handleLike = () => {
+    setLiked(!liked);
+  };
+
+  if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAF8F4] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">🔍</div>
-          <h2 className="text-2xl font-normal mb-2">Product Not Found</h2>
-          <p className="text-[#8B7060] mb-6">The product you're looking for doesn't exist.</p>
-          <button
-            onClick={() => navigate("/products")}
-            className="bg-[#1A1A1A] text-white px-6 py-2 rounded-full text-xs font-sans hover:bg-[#8B6F47] transition-colors"
-          >
-            Back to Shop
-          </button>
+          <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-300">Loading project details...</p>
         </div>
       </div>
     );
   }
 
-  const discount = product.originalPrice ? Math.round(
-    (parseInt(product.originalPrice.replace(/[^0-9]/g, '')) - 
-     parseInt(product.price.replace(/[^0-9]/g, ''))) / 
-    parseInt(product.originalPrice.replace(/[^0-9]/g, '')) * 100
-  ) : 0;
+  if (!project) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <Navbar />
+        <div className="pt-32 text-center px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-2xl mx-auto"
+          >
+            <div className="text-6xl mb-6">🔍</div>
+            <h1 className="text-4xl font-bold text-white mb-4">Project Not Found</h1>
+            <p className="text-gray-300 mb-8">The project you're looking for doesn't exist or has been moved.</p>
+            <Link to="/projects">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium flex items-center gap-2 mx-auto"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Projects
+              </motion.button>
+            </Link>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  const getIcon = () => {
+    if (project.icon === 'shopping') return ShoppingBag;
+    return Layers;
+  };
+
+  const IconComponent = getIcon();
+
+  const stats = [
+    { label: "Development Time", value: "3 months", icon: Clock, color: "blue" },
+    { label: "Team Size", value: "2-3 developers", icon: Users, color: "green" },
+    { label: "Tech Stack", value: `${project.tech.length}+ technologies`, icon: Cpu, color: "purple" },
+    { label: "Performance", value: "99.9% uptime", icon: Zap, color: "orange" }
+  ];
 
   return (
-    <div className="font-serif bg-[#FAF8F4] min-h-screen text-[#1A1A1A] overflow-x-hidden">
-      {/* Toast Notification */}
-      {toastMsg && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-[#1A1A1A] text-[#FAF8F4] px-7 py-3 rounded-full text-sm z-[999] tracking-wide shadow-lg animate-fadeInUp">
-          {toastMsg}
-        </div>
-      )}
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <FloatingShapes />
+      <Navbar />
+      
+      {/* Hero Section */}
+      <div className="relative pt-24 md:pt-32 pb-16 px-6 overflow-hidden">
+        <div className={`absolute inset-0 bg-gradient-to-br ${project.gradient} opacity-10`} />
+        
+        <div className="max-w-6xl mx-auto relative z-10">
+          {/* Back Button */}
+          <motion.button
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            onClick={() => navigate('/projects')}
+            className="mb-8 flex items-center gap-2 text-gray-400 hover:text-white transition-colors group"
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            Back to Projects
+          </motion.button>
 
-      {/* Back Button */}
-      <div className="pt-20 px-6 md:px-12 lg:px-16">
-        <button
-          onClick={() => navigate("/products")}
-          className="flex items-center gap-2 text-sm text-[#8B7060] hover:text-[#8B6F47] transition-colors font-sans"
-        >
-          ← Back to All Products
-        </button>
-      </div>
-
-      {/* Product Main Section */}
-      <section className="py-12 px-6 md:px-12 lg:px-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Left Column - Product Visual */}
-          <div className={`transition-all duration-900 ${heroVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
-            <div 
-              className="rounded-3xl p-12 flex items-center justify-center min-h-[400px] relative overflow-hidden"
-              style={{ background: product.color }}
+          <div className="grid lg:grid-cols-2 gap-12">
+            {/* Left Column - Project Info */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
             >
-              {/* Decorative elements */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-              <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-2xl" />
-              
-              {/* Badges */}
-              <div className="absolute top-6 left-6 flex gap-2">
-                {product.tag && (
-                  <span className="bg-[#FAF8F4]/90 text-[#1A1A1A] text-[10px] tracking-[0.18em] px-3 py-1.5 rounded-full font-sans font-bold">
-                    {product.tag}
-                  </span>
-                )}
-                {product.isSale && (
-                  <span className="bg-[#E05A5A] text-white text-[10px] tracking-[0.18em] px-3 py-1.5 rounded-full font-sans font-bold">
-                    SALE {discount}% OFF
-                  </span>
-                )}
-                {product.isNew && (
-                  <span className="bg-[#8B6F47] text-white text-[10px] tracking-[0.18em] px-3 py-1.5 rounded-full font-sans font-bold">
-                    NEW ARRIVAL
-                  </span>
-                )}
+              <div className={`inline-flex p-3 rounded-2xl bg-gradient-to-br ${project.gradient} mb-6`}>
+                <IconComponent className="w-8 h-8 text-white" />
               </div>
               
-              {/* Product Emoji */}
-              <span className="text-[200px] drop-shadow-2xl animate-float">
-                {product.emoji}
-              </span>
-            </div>
-          </div>
-
-          {/* Right Column - Product Info */}
-          <div className={`transition-all duration-900 delay-200 ${heroVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
-            <p className="text-[11px] tracking-[0.3em] text-[#8B6F47] uppercase font-sans mb-3">
-              {product.category}
-            </p>
-            <h1 className="text-4xl md:text-5xl font-normal mb-4">{product.name}</h1>
-            
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex items-center gap-1">
-                <span className="text-yellow-500 text-lg">★</span>
-                <span className="text-sm font-bold">{product.rating}</span>
-                <span className="text-xs text-[#8B7060]">({product.reviews} reviews)</span>
-              </div>
-              {product.inStock ? (
-                <span className="text-xs text-green-600 font-sans">✓ In Stock</span>
-              ) : (
-                <span className="text-xs text-red-600 font-sans">✗ Out of Stock</span>
-              )}
-            </div>
-
-            <div className="flex items-center gap-3 mb-6">
-              <span className="text-3xl font-bold">{product.price}</span>
-              {product.originalPrice && (
-                <>
-                  <span className="text-lg text-[#8B7060] line-through">{product.originalPrice}</span>
-                  <span className="text-sm text-green-600 font-sans">Save {discount}%</span>
-                </>
-              )}
-            </div>
-
-            <p className="text-base leading-relaxed text-[#5A4A3A] mb-8 font-sans border-l-3 border-[#8B6F47] pl-4 italic">
-              {product.longDesc}
-            </p>
-
-            {/* Size Selection */}
-            <div className="mb-6">
-              <p className="text-sm font-bold mb-3">Select Size</p>
-              <div className="flex flex-wrap gap-3">
-                {product.sizes.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`w-12 h-12 rounded-full text-sm font-sans transition-all duration-200
-                      ${selectedSize === size 
-                        ? 'bg-[#1A1A1A] text-white' 
-                        : 'bg-white border border-[#1A1A1A]/20 hover:border-[#8B6F47]'}`}
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+                {project.title}
+              </h1>
+              
+              <p className="text-xl text-gray-300 mb-6 leading-relaxed">
+                {project.fullDescription}
+              </p>
+              
+              <div className="flex flex-wrap gap-3 mb-8">
+                {project.tech.map((tech, idx) => (
+                  <motion.span
+                    key={idx}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className="px-3 py-1 rounded-full bg-white/10 text-gray-300 text-sm border border-white/10 hover:border-purple-400/50 transition-colors"
                   >
-                    {size}
-                  </button>
+                    {tech}
+                  </motion.span>
                 ))}
               </div>
-            </div>
-
-            {/* Color Selection */}
-            <div className="mb-8">
-              <p className="text-sm font-bold mb-3">Select Color</p>
-              <div className="flex flex-wrap gap-3">
-                {product.colors.map((color) => (
-                  <button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
-                    className={`px-5 py-2 rounded-full text-xs font-sans transition-all duration-200
-                      ${selectedColor === color 
-                        ? 'bg-[#1A1A1A] text-white' 
-                        : 'bg-white border border-[#1A1A1A]/20 hover:border-[#8B6F47]'}`}
-                  >
-                    {color}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Contact to Buy Button */}
-            <button
-              onClick={handleContactToBuy}
-              disabled={!product.inStock}
-              className={`w-full py-4 text-sm tracking-[0.15em] uppercase cursor-pointer rounded-full font-sans transition-all duration-200 flex items-center justify-center gap-3
-                ${product.inStock 
-                  ? 'bg-[#1A1A1A] text-[#FAF8F4] hover:bg-[#8B6F47]' 
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-            >
-              <span>📞</span>
-              {product.inStock ? 'Contact Us to Buy' : 'Out of Stock'}
-            </button>
-
-            <p className="text-[10px] text-center text-[#8B7060] mt-4 font-sans">
-              Contact our sales team for purchase inquiries, bulk orders, and customization options.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Product Details Tabs */}
-      <section className="py-12 px-6 md:px-12 lg:px-16 border-t border-[#1A1A1A]/10">
-        <div className="flex gap-8 border-b border-[#1A1A1A]/10 mb-8">
-          {[
-            { id: "details", label: "Product Details" },
-            { id: "specs", label: "Specifications" },
-            { id: "care", label: "Care Instructions" },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`pb-3 text-sm font-sans tracking-wide transition-all duration-200
-                ${activeTab === tab.id 
-                  ? 'text-[#8B6F47] border-b-2 border-[#8B6F47]' 
-                  : 'text-[#8B7060] hover:text-[#1A1A1A]'}`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="py-4">
-          {activeTab === "details" && product.features && (
-            <div>
-              <h3 className="text-lg font-bold mb-4">Key Features</h3>
-              <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {product.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-center gap-3 text-sm text-[#5A4A3A] font-sans">
-                    <span className="text-[#8B6F47]">✓</span>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
               
-              {product.materials && (
-                <>
-                  <h3 className="text-lg font-bold mt-8 mb-4">Materials</h3>
-                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {product.materials.map((material, idx) => (
-                      <li key={idx} className="flex items-center gap-3 text-sm text-[#5A4A3A] font-sans">
-                        <span className="text-[#8B6F47]">•</span>
-                        {material}
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
-            </div>
-          )}
-
-          {activeTab === "specs" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-bold mb-4">Product Specifications</h3>
-                <table className="w-full">
-                  <tbody className="divide-y divide-[#1A1A1A]/10">
-                    <tr className="py-3">
-                      <td className="py-2 text-sm font-sans font-bold">Category</td>
-                      <td className="py-2 text-sm text-[#5A4A3A] font-sans">{product.category}</td>
-                    </tr>
-                    <tr className="py-3">
-                      <td className="py-2 text-sm font-sans font-bold">SKU</td>
-                      <td className="py-2 text-sm text-[#5A4A3A] font-sans">AD-{product.id.toString().padStart(4, '0')}</td>
-                    </tr>
-                    <tr className="py-3">
-                      <td className="py-2 text-sm font-sans font-bold">Availability</td>
-                      <td className="py-2 text-sm text-[#5A4A3A] font-sans">
-                        {product.inStock ? 'In Stock' : 'Out of Stock'}
-                      </td>
-                    </tr>
-                    <tr className="py-3">
-                      <td className="py-2 text-sm font-sans font-bold">Origin</td>
-                      <td className="py-2 text-sm text-[#5A4A3A] font-sans">Galle, Sri Lanka</td>
-                    </tr>
-                    <tr className="py-3">
-                      <td className="py-2 text-sm font-sans font-bold">Craftsmanship</td>
-                      <td className="py-2 text-sm text-[#5A4A3A] font-sans">100% Handcrafted</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div className="flex flex-wrap gap-4">
+                <motion.a
+                  href={project.liveUrl || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium flex items-center gap-2 shadow-lg shadow-purple-500/25"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Live Demo
+                </motion.a>
+                <motion.a
+                  href={project.githubUrl || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-6 py-3 rounded-full border-2 border-gray-600 text-gray-300 font-medium hover:border-purple-400 hover:text-white transition flex items-center gap-2"
+                >
+                 
+                  GitHub
+                </motion.a>
               </div>
-              <div>
-                <h3 className="text-lg font-bold mb-4">Sizing Information</h3>
-                <p className="text-sm text-[#5A4A3A] font-sans mb-4">
-                  Available sizes: {product.sizes.join(", ")}
-                </p>
-                <div className="bg-[#F4F0E8] rounded-xl p-4">
-                  <p className="text-xs text-[#8B6F47] font-sans mb-2">💡 Sizing Tip</p>
-                  <p className="text-xs text-[#5A4A3A] font-sans">
-                    These shoes fit true to size. If you're between sizes, we recommend 
-                    sizing up for the most comfortable fit. Contact us for detailed size guidance.
-                  </p>
+            </motion.div>
+
+            {/* Right Column - Project Image */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, type: "spring" }}
+              className="relative"
+            >
+              <div className="relative group">
+                <div className="absolute -inset-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl blur-2xl opacity-40 group-hover:opacity-70 transition duration-500" />
+                <div className="relative bg-gray-800 rounded-2xl overflow-hidden border border-white/10">
+                  <div className={`h-48 bg-gradient-to-br ${project.gradient} flex items-center justify-center`}>
+                    <IconComponent className="w-24 h-24 text-white/30" />
+                  </div>
+                  <div className="p-6">
+                    <div className="flex items-center gap-4 text-sm text-gray-400">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        <span>2024</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Star className="w-3 h-3 text-yellow-400" />
+                        <span>Featured Project</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            </motion.div>
+          </div>
+        </div>
+      </div>
 
-          {activeTab === "care" && product.careInstructions && (
-            <div>
-              <h3 className="text-lg font-bold mb-4">How to Care for Your {product.name}</h3>
-              <ul className="space-y-3">
-                {product.careInstructions.map((instruction, idx) => (
-                  <li key={idx} className="flex items-start gap-3">
-                    <span className="text-[#8B6F47] text-lg">•</span>
-                    <span className="text-sm text-[#5A4A3A] font-sans">{instruction}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-6 bg-[#F4F0E8] rounded-xl p-4">
-                <p className="text-xs text-[#8B6F47] font-sans mb-2">🛡️ Warranty Information</p>
-                <p className="text-xs text-[#5A4A3A] font-sans">
-                  All Adithya shoes come with a 2-year warranty against manufacturing defects. 
-                  Contact our support team for warranty claims.
-                </p>
-              </div>
-            </div>
-          )}
+      {/* Project Statistics */}
+      <section className="py-12 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {stats.map((stat, idx) => {
+              const StatIcon = stat.icon;
+              const colorMap: Record<string, string> = {
+                blue: "from-blue-500/10 to-blue-500/5 border-blue-500/20 text-blue-400",
+                green: "from-green-500/10 to-green-500/5 border-green-500/20 text-green-400",
+                purple: "from-purple-500/10 to-purple-500/5 border-purple-500/20 text-purple-400",
+                orange: "from-orange-500/10 to-orange-500/5 border-orange-500/20 text-orange-400"
+              };
+              return (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  viewport={{ once: true }}
+                  className={`bg-gradient-to-br ${colorMap[stat.color]} rounded-2xl p-4 text-center border hover:scale-105 transition-transform duration-300`}
+                >
+                  <StatIcon className={`w-6 h-6 ${colorMap[stat.color].split(' ')[2]} mx-auto mb-2`} />
+                  <div className="text-xl font-bold text-white">{stat.value}</div>
+                  <div className="text-xs text-gray-400">{stat.label}</div>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
-      {/* Handcrafted in Galle Section */}
-      <section className="py-16 px-6 md:px-12 lg:px-16 bg-[#1A3A2E] text-white mt-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="text-center lg:text-left">
-            <div className="text-6xl mb-4">🇱🇰</div>
-            <h2 className="text-3xl md:text-4xl font-normal mb-4">
-              Handcrafted in <em className="italic text-[#C8A87A]">Galle, Sri Lanka</em>
+      {/* Key Features Section */}
+      <section className="py-16 px-6">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Key <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Features</span>
             </h2>
-            <p className="text-base text-white/70 mb-6 font-sans">
-              Every pair of Adithya shoes is meticulously handcrafted by master artisans 
-              in the historic city of Galle. We take pride in supporting local communities 
-              and preserving traditional craftsmanship.
+            <p className="text-gray-300 max-w-2xl mx-auto">
+              What makes this project stand out from the rest
             </p>
-            <div className="flex gap-6 justify-center lg:justify-start">
-              <div>
-                <p className="text-2xl font-bold text-[#C8A87A]">50+</p>
-                <p className="text-[10px] text-white/50 font-sans">Master Artisans</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-[#C8A87A]">7+</p>
-                <p className="text-[10px] text-white/50 font-sans">Years of Excellence</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-[#C8A87A]">100%</p>
-                <p className="text-[10px] text-white/50 font-sans">Handcrafted</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white/10 rounded-2xl p-8 text-center border border-white/20">
-            <div className="text-5xl mb-3">🏰</div>
-            <p className="text-sm italic text-[#C8A87A] mb-2">
-              "Every stitch carries the spirit of Galle"
-            </p>
-            <p className="text-xs text-white/50 font-sans">— Our Master Artisans</p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {project.features.map((feature, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, x: idx % 2 === 0 ? -30 : 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                viewport={{ once: true }}
+                className="flex items-start gap-3 p-4 rounded-xl bg-white/5 border border-white/10 hover:border-purple-400/30 transition-all duration-300 group"
+              >
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 group-hover:scale-110 transition-transform" />
+                <span className="text-gray-300">{feature}</span>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Contact CTA */}
-      <section className="py-16 px-6 md:px-12 lg:px-16 bg-[#F4F0E8]">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="text-5xl mb-4">📞</div>
-          <h2 className="text-2xl md:text-3xl font-normal mb-4">
-            Ready to Purchase This Product?
-          </h2>
-          <p className="text-base text-[#5A4A3A] mb-8 font-sans">
-            Contact our sales team for pricing, bulk orders, or customization requests. 
-            We typically respond within 2-4 hours.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={handleContactToBuy}
-              className="bg-[#1A1A1A] text-white px-8 py-3 text-xs tracking-[0.15em] uppercase rounded-full font-sans hover:bg-[#8B6F47] transition-all duration-200"
+      {/* Action Buttons */}
+      <section className="py-16 px-6">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="flex flex-wrap justify-center gap-4"
+          >
+            <motion.a
+              href={project.liveUrl || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-4 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium flex items-center gap-2 shadow-lg shadow-purple-500/25"
             >
-              Contact Sales →
-            </button>
-            <button
-              onClick={() => navigate("/products")}
-              className="bg-transparent text-[#1A1A1A] border border-[#1A1A1A]/30 px-8 py-3 text-xs tracking-[0.15em] uppercase rounded-full font-sans hover:border-[#8B6F47] hover:text-[#8B6F47] transition-all duration-200"
+              <ExternalLink className="w-5 h-5" />
+              View Live Project
+            </motion.a>
+            
+            <motion.a
+              href={project.githubUrl || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-4 rounded-full border-2 border-gray-600 text-gray-300 font-medium hover:border-purple-400 hover:text-white transition flex items-center gap-2"
             >
-              Browse More Products
-            </button>
-          </div>
+             
+              Source Code
+            </motion.a>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleLike}
+              className={`px-8 py-4 rounded-full border-2 transition flex items-center gap-2 ${
+                liked 
+                  ? 'border-pink-500 bg-pink-500/20 text-pink-400' 
+                  : 'border-gray-600 text-gray-300 hover:border-pink-500 hover:text-pink-400'
+              }`}
+            >
+              <Heart className={`w-5 h-5 ${liked ? 'fill-pink-500' : ''}`} />
+              {liked ? 'Liked' : 'Like Project'}
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleCopyLink}
+              className="px-8 py-4 rounded-full border-2 border-gray-600 text-gray-300 hover:border-cyan-400 hover:text-cyan-400 transition flex items-center gap-2"
+            >
+              {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+              {copied ? 'Copied!' : 'Share'}
+            </motion.button>
+          </motion.div>
         </div>
       </section>
 
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(-3deg); }
-          50% { transform: translateY(-10px) rotate(3deg); }
-        }
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateX(-50%) translateY(10px); }
-          to { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-        .animate-float {
-          animation: float 4s ease-in-out infinite;
-        }
-        .animate-fadeInUp {
-          animation: fadeInUp 0.3s ease;
-        }
-        .border-l-3 {
-          border-left-width: 3px;
-        }
-      `}</style>
+      {/* Related Projects */}
+      <section className="py-16 px-6">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              You Might <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Also Like</span>
+            </h2>
+            <p className="text-gray-300 max-w-2xl mx-auto">
+              Explore more of my featured projects
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {projects.filter(p => p.id !== project.id).slice(0, 3).map((relatedProject, idx) => {
+              const RelatedIcon = relatedProject.icon === 'shopping' ? ShoppingBag : Layers;
+              return (
+                <motion.div
+                  key={relatedProject.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <Link to={`/project/${relatedProject.id}`}>
+                    <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 border border-white/10 hover:border-purple-400/50 transition-all group cursor-pointer">
+                      <div className={`p-2 rounded-xl bg-gradient-to-br ${relatedProject.gradient} w-10 h-10 flex items-center justify-center mb-3`}>
+                        <RelatedIcon className="w-5 h-5 text-white" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-purple-400 transition">{relatedProject.title}</h3>
+                      <p className="text-gray-400 text-sm">{relatedProject.description.substring(0, 80)}...</p>
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
     </div>
   );
-}
+};
+
+export default ProjectDetail;
